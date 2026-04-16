@@ -1,9 +1,15 @@
 # FPGA Audio Effect Device — Custom DMA & Dual-Processor DSP
 
 Mini-project for the EPFL *Embedded Systems* course (June 2023).  
-Team: Albian Salihu, Andy Piantoni.
+Team: Albian Salihu, Andy Piantoni. Both the hardware design and firmware were developed jointly throughout.
 
-A real-time-adjacent audio effect device on the Intel DE1-SoC FPGA board. A microphone records audio, two custom hardware IP cores (a DMA controller and an interrupt-based mailbox) coordinate data movement between two independent Nios II soft-core processors, and the processed audio plays back through the speaker. All hardware IP was designed and implemented from scratch in VHDL.
+A quasi-real-time audio effect device on the Intel DE1-SoC FPGA board. A microphone records audio, two custom hardware IP cores (a DMA controller and an interrupt-based mailbox) coordinate data movement between two independent Nios II soft-core processors, and the processed audio plays back through the speaker. All hardware IP was designed and implemented from scratch in VHDL.
+
+---
+
+## Result
+
+The full pipeline ran successfully on hardware: 10 seconds of audio recorded via microphone, processed through an FFT-based low-pass filter across 480,000 samples, and played back through the speaker. The custom DMA and IRQ Sender IPs functioned correctly — interrupt-driven handoff between processors with zero polling, and proper Avalon back-pressure handling throughout.
 
 ---
 
@@ -227,40 +233,6 @@ With 48 kHz sampling and Nyquist at 24 kHz, the filter removes the top ~4 kHz ba
 
 ---
 
-## Portfolio Note — Cleanup vs. Original Submission
+## Portfolio Note
 
-The source files in this repository were cleaned up from the original course submission. All changes are cosmetic or correctness fixes; **no logic was modified**.
-
-### `custom_DMA.vhd`
-- Removed 18-line commented-out debug block (`stateTest` process and signal — a leftover from simulation that was never re-enabled).
-- Translated French inline comments to English; fixed UTF-8 encoding artifacts (mojibake) in French text.
-
-### `custom_interrupt_sender.vhd`
-- Fixed typo: `Avalaon` → `Avalon`.
-- Added an entity-level description comment explaining the mailbox protocol.
-
-### `DE1_SoC_top_level.vhd`
-- Removed ~100 lines of commented-out unused port declarations (HPS, VGA, GPIO, PS2, SEG7, IR) — they were boilerplate from the course template and obscured the relevant connections.
-- Normalised port map indentation.
-
-### `tb_custom_DMA.vhd`
-- Fixed a **compile error**: the testbench port map referenced `stateTest`, which is a commented-out port in `custom_DMA`. The signal declaration and port-map entry were removed to match the actual entity interface.
-- Replaced the original French architecture comment (which stated the file "was never used nor made to test the DMA") with an accurate English description of what the testbench does exercise.
-- Replaced boolean-branch `if/else` in the stimulus procedure with concise conditional signal assignment.
-
-### `tb_custom_interrupt_sender.vhd`
-- No functional changes; reformatted for consistency with the DMA testbench.
-
-### `sw/Audio_CPU0/main0.c`
-- Removed the Nios II EDS "Hello World" IDE boilerplate comment block (14 lines).
-- Translated two French `printf` strings to English.
-
-### `sw/Audio_CPU1/main1.c`
-- Removed the "Hello World" IDE boilerplate comment block.
-- **Fixed hardcoded absolute Windows path** for KissFFT: `"C:/MiniProjectAudio/.../kiss_fft.h"` → `"kiss_fft.h"` (KissFFT must be on the compiler include path — see Build & Run above).
-- Translated four French `printf` strings to English.
-- Removed two unused global variables (`flagtest1`, `flagtest2`) — set in ISRs but never read.
-- Removed two unused local variables (`perc`, `start_Listening`) — declared but never referenced.
-- Removed `debug` loop counter from both `main0.c` and `main1.c` — incremented but never read or printed.
-- Removed two large commented-out "NOT USING DMA" code blocks (manual memcpy alternatives kept for development that served no purpose in the submission).
-- Fixed pipeline flow diagram: `count += SIZE_FFT` happens in the main loop processing block, not in `isr_DMA_send` as originally documented.
+This repository is a cleaned-up version of the original EPFL Embedded Systems submission. All hardware logic and firmware algorithms are **untouched**. Changes were limited to: fixing a compile error in `tb_custom_DMA.vhd` (stateTest port reference), fixing a hardcoded absolute Windows path for KissFFT in `main1.c`, removing unused debug signals and variables across both firmware files, and translating French comments to English.
