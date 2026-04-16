@@ -3,6 +3,9 @@
 Mini-project for the EPFL *Embedded Systems* course (June 2023).  
 Team: Albian Salihu, Andy Piantoni. Both the hardware design and firmware were developed jointly throughout.
 
+| VHDL | C | Avalon | Nios II | KissFFT | Quartus | DE1-SoC |
+|------|---|--------|---------|---------|---------|---------|
+
 A quasi-real-time audio effect device on the Intel DE1-SoC FPGA board. A microphone records audio, two custom hardware IP cores (a DMA controller and an interrupt-based mailbox) coordinate data movement between two independent Nios II soft-core processors, and the processed audio plays back through the speaker. All hardware IP was designed and implemented from scratch in VHDL.
 
 ---
